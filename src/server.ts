@@ -1,12 +1,9 @@
 import express from 'express';
-import dataRoutes from './routes/data.routes';
-import { config } from 'dotenv';
-
-config();
+import router from './routes';
 
 const server = express();
 
 server.use(express.json());
-server.use('/data', dataRoutes);
+server.use('/data', router);
 
 server.listen(80);

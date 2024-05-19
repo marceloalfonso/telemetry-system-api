@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import pool from '../mysql';
+import pool from '../databases';
 
-class DataRepository {
+class Repository {
   upload(req: Request, res: Response) {
     const { temperature, vibration, sound, current } = req.query;
 
@@ -48,4 +48,4 @@ class DataRepository {
   }
 }
 
-export default DataRepository;
+export default Repository;
