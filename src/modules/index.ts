@@ -1,14 +1,19 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import pool from '../databases';
+import { z } from 'zod';
+
+const dataSchema = z.object({
+  temperature: z.string(),
+  vibration: z.string(),
+  sound: z.string(),
+  current: z.string(),
+});
 
 class Repository {
   upload(request: FastifyRequest, reply: FastifyReply) {
-    const { temperature, vibration, sound, current } = request.query as {
-      temperature: string;
-      vibration: string;
-      sound: string;
-      current: string;
-    };
+    const { temperature, vibration, sound, current } = request.query as z.infer<
+      typeof dataSchema
+    >;
 
     pool.getConnection((connectionError, databaseConnection) => {
       if (connectionError) {
