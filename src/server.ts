@@ -1,9 +1,8 @@
-import express from 'express';
-import router from './routes';
+import routes from './routes';
+import fastify from 'fastify';
 
-const server = express();
+const server = fastify();
 
-server.use(express.json());
-server.use('/data', router);
+server.register(routes, { prefix: '/data' });
 
-server.listen(80);
+server.listen({ port: 80 });

@@ -1,13 +1,21 @@
-import { Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import pool from '../databases';
 
 class Repository {
-  upload(req: Request, res: Response) {
-    const { temperature, vibration, sound, current } = req.query;
+  upload(request: FastifyRequest, reply: FastifyReply) {
+    const { temperature, vibration, sound, current } = request.query as {
+      temperature: string;
+      vibration: string;
+      sound: string;
+      current: string;
+    };
 
     pool.getConnection((connectionError, databaseConnection) => {
       if (connectionError) {
-        return res.status(500).json('Erro ao conectar com o banco de dados');
+        return reply
+          .code(500)
+          .type('application/json')
+          .send('Erro ao conectar com o banco de dados');
       }
 
       databaseConnection.query(
@@ -17,19 +25,28 @@ class Repository {
           databaseConnection.release();
 
           if (queryExecutionError) {
-            return res.status(500).json('Erro ao inserir os dados');
+            return reply
+              .code(500)
+              .type('application/json')
+              .send('Erro ao inserir os dados');
           }
 
-          return res.status(200).json('Dados inseridos com sucesso');
+          return reply
+            .code(200)
+            .type('application/json')
+            .send('Dados inseridos com sucesso');
         }
       );
     });
   }
 
-  fetch(req: Request, res: Response) {
+  fetch(request: FastifyRequest, reply: FastifyReply) {
     pool.getConnection((connectionError, databaseConnection) => {
       if (connectionError) {
-        return res.status(500).json('Erro ao conectar com o banco de dados');
+        return reply
+          .code(500)
+          .type('application/json')
+          .send('Erro ao conectar com o banco de dados');
       }
 
       databaseConnection.query(
@@ -38,10 +55,13 @@ class Repository {
           databaseConnection.release();
 
           if (queryExecutionError) {
-            return res.status(500).json('Erro ao exibir os dados');
+            return reply
+              .code(500)
+              .type('application/json')
+              .send('Erro ao exibir os dados');
           }
 
-          return res.status(200).json(data);
+          return reply.code(200).type('application/json').send(data);
         }
       );
     });

@@ -1,15 +1,12 @@
-import { Router } from 'express';
+import { FastifyInstance } from 'fastify';
 import Repository from '../modules';
+import e from 'express';
 
-const router = Router();
 const repository = new Repository();
 
-router.get('/upload', (req, res) => {
-  repository.upload(req, res);
-});
+const routes = async (server: FastifyInstance) => {
+  server.get('/upload', (request, reply) => repository.upload(request, reply));
+  server.get('/fetch', (request, reply) => repository.fetch(request, reply));
+};
 
-router.get('/fetch', (req, res) => {
-  repository.fetch(req, res);
-});
-
-export default router;
+export default routes;
