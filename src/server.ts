@@ -5,4 +5,7 @@ const server = fastify();
 
 server.register(routes, { prefix: '/data' });
 
-server.listen({ port: 80 });
+server.listen({
+  host: 'RENDER' in process.env ? `0.0.0.0` : `localhost`,
+  port: 80,
+});
