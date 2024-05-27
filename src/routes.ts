@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import Repository from '../modules';
-import e from 'express';
+import Repository from './Repository';
 
 const repository = new Repository();
 

@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import pool from '../databases';
+import pool from './mysql';
 import { z } from 'zod';
 
 const dataSchema = z.object({
