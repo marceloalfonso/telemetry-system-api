@@ -9,68 +9,66 @@ const dataSchema = z.object({
   current: z.string(),
 });
 
-class Repository {
-  upload(request: FastifyRequest, reply: FastifyReply) {
-    const { temperature, vibration, sound, current } = request.query as z.infer<
-      typeof dataSchema
-    >;
+const upload = (request: FastifyRequest, reply: FastifyReply) => {
+  const { temperature, vibration, sound, current } = request.query as z.infer<
+    typeof dataSchema
+  >;
 
-    pool.getConnection((connectionError, databaseConnection) => {
-      if (connectionError) {
-        return reply
-          .code(500)
-          .type('application/json')
-          .send('Erro ao conectar com o banco de dados');
-      }
+  pool.getConnection((connectionError, databaseConnection) => {
+    if (connectionError) {
+      return reply
+        .code(500)
+        .type('application/json')
+        .send('Erro ao conectar com o banco de dados');
+    }
 
-      databaseConnection.query(
-        'INSERT into equipment (temperature, vibration, sound, current) values (?, ?, ?, ?)',
-        [temperature, vibration, sound, current],
-        (queryExecutionError, _data, _fields) => {
-          databaseConnection.release();
+    databaseConnection.query(
+      'INSERT into equipment (temperature, vibration, sound, current) values (?, ?, ?, ?)',
+      [temperature, vibration, sound, current],
+      (queryExecutionError, _data, _fields) => {
+        databaseConnection.release();
 
-          if (queryExecutionError) {
-            return reply
-              .code(500)
-              .type('application/json')
-              .send('Erro ao inserir os dados');
-          }
-
+        if (queryExecutionError) {
           return reply
-            .code(200)
+            .code(500)
             .type('application/json')
-            .send('Dados inseridos com sucesso');
+            .send('Erro ao inserir os dados');
         }
-      );
-    });
-  }
 
-  fetch(request: FastifyRequest, reply: FastifyReply) {
-    pool.getConnection((connectionError, databaseConnection) => {
-      if (connectionError) {
         return reply
-          .code(500)
+          .code(200)
           .type('application/json')
-          .send('Erro ao conectar com o banco de dados');
+          .send('Dados inseridos com sucesso');
       }
+    );
+  });
+};
 
-      databaseConnection.query(
-        'SELECT * FROM (SELECT * FROM equipment ORDER BY id DESC LIMIT 20) sub ORDER BY id ASC',
-        (queryExecutionError, data, _fields) => {
-          databaseConnection.release();
+const fetch = (request: FastifyRequest, reply: FastifyReply) => {
+  pool.getConnection((connectionError, databaseConnection) => {
+    if (connectionError) {
+      return reply
+        .code(500)
+        .type('application/json')
+        .send('Erro ao conectar com o banco de dados');
+    }
 
-          if (queryExecutionError) {
-            return reply
-              .code(500)
-              .type('application/json')
-              .send('Erro ao exibir os dados');
-          }
+    databaseConnection.query(
+      'SELECT * FROM (SELECT * FROM equipment ORDER BY id DESC LIMIT 20) sub ORDER BY id ASC',
+      (queryExecutionError, data, _fields) => {
+        databaseConnection.release();
 
-          return reply.code(200).type('application/json').send(data);
+        if (queryExecutionError) {
+          return reply
+            .code(500)
+            .type('application/json')
+            .send('Erro ao exibir os dados');
         }
-      );
-    });
-  }
-}
 
-export default Repository;
+        return reply.code(200).type('application/json').send(data);
+      }
+    );
+  });
+};
+
+export { upload, fetch };
