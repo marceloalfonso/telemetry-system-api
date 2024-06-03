@@ -7,12 +7,12 @@ const dataSchema = z.object({
   vibration: z.string(),
   sound: z.string(),
   current: z.string(),
+  tension: z.string(),
 });
 
 const upload = (request: FastifyRequest, reply: FastifyReply) => {
-  const { temperature, vibration, sound, current } = request.query as z.infer<
-    typeof dataSchema
-  >;
+  const { temperature, vibration, sound, current, tension } =
+    request.query as z.infer<typeof dataSchema>;
 
   pool.getConnection((connectionError, databaseConnection) => {
     if (connectionError) {
@@ -23,8 +23,8 @@ const upload = (request: FastifyRequest, reply: FastifyReply) => {
     }
 
     databaseConnection.query(
-      'INSERT into equipment (temperature, vibration, sound, current) values (?, ?, ?, ?)',
-      [temperature, vibration, sound, current],
+      'INSERT into equipment (temperature, vibration, sound, current, tension) values (?, ?, ?, ?, ?)',
+      [temperature, vibration, sound, current, tension],
       (queryExecutionError, _data, _fields) => {
         databaseConnection.release();
 
